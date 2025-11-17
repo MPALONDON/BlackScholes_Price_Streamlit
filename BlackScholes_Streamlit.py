@@ -283,10 +283,15 @@ with st.expander("Show recent saved calculations (inputs)"):
 
     database_table = pd.read_sql_table("BlackScholesInputs", engine)
     if len(database_table) >0:
-        df = database_table.to_csv(index=False)
+
+        @st.cache_data
+        def convert_df(df):
+            return df.to_csv(index=False).encode('utf-8')
+
+        csv = convert_df(database_table)
         st.download_button(
             "Download Inputs",
-            df,
+            csv,
             "Inputs.csv",
             "text/csv"
         )
@@ -324,10 +329,15 @@ with st.expander("Show sample saved outputs (most recent 50 rows)"):
 
     database_table = pd.read_sql_table("BlackScholesOutputs", engine)
     if len(database_table) > 0:
-        df = database_table.to_csv(index=False)
+
+        @st.cache_data
+        def convert_df(df):
+            return df.to_csv(index=False).encode('utf-8')
+
+        csv = convert_df(database_table)
         st.download_button(
             "Download Outputs",
-            df,
+            csv,
             "Outputs.csv",
             "text/csv"
         )
