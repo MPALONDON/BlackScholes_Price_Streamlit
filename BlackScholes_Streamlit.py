@@ -8,7 +8,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sqlalchemy import create_engine,Integer,Numeric,Boolean,ForeignKey,DateTime
 from sqlalchemy.orm import declarative_base, sessionmaker, mapped_column, Mapped
-from decimal import Decimal
 from datetime import datetime
 
 
@@ -63,22 +62,22 @@ class BlackScholesInput(Base):
     __tablename__ = "BlackScholesInputs"
 
     CalculationId:Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    StockPrice:Mapped[Decimal] = mapped_column(Numeric(18, 9), nullable=False)
-    StrikePrice:Mapped[Decimal] = mapped_column(Numeric(18, 9), nullable=False)
-    InterestRate:Mapped[Decimal] = mapped_column(Numeric(18, 9), nullable=False)
-    Volatility:Mapped[Decimal] = mapped_column(Numeric(18, 9), nullable=False)
-    TimeToExpiry:Mapped[Decimal] = mapped_column(Numeric(18, 9), nullable=False)
-    CallPurchasePrice:Mapped[Decimal] = mapped_column(Numeric(18,9), nullable=True)
-    PutPurchasePrice:Mapped[Decimal] = mapped_column(Numeric(18,9), nullable=True)
+    StockPrice:Mapped[float] = mapped_column(Numeric(18, 9), nullable=False)
+    StrikePrice:Mapped[float] = mapped_column(Numeric(18, 9), nullable=False)
+    InterestRate:Mapped[float] = mapped_column(Numeric(18, 9), nullable=False)
+    Volatility:Mapped[float] = mapped_column(Numeric(18, 9), nullable=False)
+    TimeToExpiry:Mapped[float] = mapped_column(Numeric(18, 9), nullable=False)
+    CallPurchasePrice:Mapped[float] = mapped_column(Numeric(18,9), nullable=True)
+    PutPurchasePrice:Mapped[float] = mapped_column(Numeric(18,9), nullable=True)
     CreatedAt:Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
 
 class BlackScholesOutput(Base):
     __tablename__ = "BlackScholesOutputs"
 
     CalculationOutputId:Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    VolatilityShock:Mapped[Decimal] = mapped_column(Numeric(18, 9), nullable=False)
-    StockPriceShock:Mapped[Decimal] = mapped_column(Numeric(18, 9), nullable=False)
-    OptionPrice:Mapped[Decimal] = mapped_column(Numeric(18, 9), nullable=False)
+    VolatilityShock:Mapped[float] = mapped_column(Numeric(18, 9), nullable=False)
+    StockPriceShock:Mapped[float] = mapped_column(Numeric(18, 9), nullable=False)
+    OptionPrice:Mapped[float] = mapped_column(Numeric(18, 9), nullable=False)
     IsCall:Mapped[bool] = mapped_column(Boolean, nullable=False)
     CalculationId:Mapped[int] = mapped_column(Integer, ForeignKey("BlackScholesInputs.CalculationId"), nullable=False)
 
@@ -151,6 +150,12 @@ with col2:
 
 st.markdown("---")
 
+if st.button("Clear Database"):
+    session = SessionLocal()
+    session.query(BlackScholesInput).delete(synchronize_session=False)
+    session.query(BlackScholesOutput).delete(synchronize_session=False)
+    session.commit()
+    st.success("Database has been cleared")
 
 if st.button("Calculate & Save (inputs + heatmap outputs)"):
 
