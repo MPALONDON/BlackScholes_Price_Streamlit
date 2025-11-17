@@ -281,6 +281,16 @@ with st.expander("Show recent saved calculations (inputs)"):
     finally:
         session.close()
 
+    database_table = pd.read_sql_table("BlackScholesInputs", engine)
+    if len(database_table) >0:
+        df = database_table.to_csv(index=False)
+        st.download_button(
+            "Download Inputs",
+            df,
+            "Inputs.csv",
+            "text/csv"
+        )
+
 with st.expander("Show sample saved outputs (most recent 50 rows)"):
     session = SessionLocal()
     try:
@@ -311,5 +321,15 @@ with st.expander("Show sample saved outputs (most recent 50 rows)"):
         st.error(f"DB read error: {e}")
     finally:
         session.close()
+
+    database_table = pd.read_sql_table("BlackScholesOutputs", engine)
+    if len(database_table) > 0:
+        df = database_table.to_csv(index=False)
+        st.download_button(
+            "Download Outputs",
+            df,
+            "Outputs.csv",
+            "text/csv"
+        )
 
 st.caption("Heatmaps show P/L. Green = profit, Red = loss.")
